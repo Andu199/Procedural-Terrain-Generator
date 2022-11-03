@@ -10,8 +10,6 @@ layout(location = 0) in vec2 v_texture_coord[];
 // Uniform properties
 uniform mat4 View;
 uniform mat4 Projection;
-uniform int instances;
-// TODO(student): Declare other uniforms here
 
 // Output
 layout(location = 0) out vec2 texture_coord;
@@ -33,14 +31,8 @@ void main()
     const vec3 INSTANCE_OFFSET = vec3(1.25, 0, 1.25);
     const int NR_COLS = 6;
 
-    // TODO(student): Second, modify the points so that the
-    // triangle shrinks relative to its center
-
-    for (int i = 0; i <= instances; i++)
+    for (int i = 0; i <= 1; i++)
     {
-        // TODO(student): First, modify the offset so that instances
-        // are displayed on `NR_COLS` columns. Test your code by
-        // changing the value of `NR_COLS`. No need to recompile.
         vec3 offset = vec3(0, 0, 0);
 
         texture_coord = v_texture_coord[0];

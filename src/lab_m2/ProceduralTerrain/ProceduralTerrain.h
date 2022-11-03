@@ -5,11 +5,11 @@
 
 namespace m2
 {
-    class Lab1 : public gfxc::SimpleScene
+    class ProceduralTerrain : public gfxc::SimpleScene
     {
      public:
-        Lab1();
-        ~Lab1();
+         ProceduralTerrain();
+        ~ProceduralTerrain();
 
         void Init() override;
 
@@ -28,9 +28,6 @@ namespace m2
         void OnWindowResize(int width, int height) override;
 
      private:
-        unsigned int nrInstances;
-        unsigned int maxInstances;
-        float shrink;
 
     };
 }   // namespace m2
