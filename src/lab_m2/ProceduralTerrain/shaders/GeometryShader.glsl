@@ -1,49 +1,72 @@
 #version 430
 
 // Input and output topologies
-layout(triangles) in;
-layout(triangle_strip, max_vertices = 170) out;
+layout(points) in;
+layout(triangle_strip, max_vertices = 256) out;
 
 // Input
-layout(location = 0) in vec2 v_texture_coord[];
+uniform sampler2D texture_1;
 
 // Uniform properties
+uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
 
-// Output
-layout(location = 0) out vec2 texture_coord;
+uniform vec2 textPos;
+uniform float textSize;
 
+uniform int minHeight;
+uniform int maxHeight;
 
-void EmitPoint(vec3 pos, vec3 offset)
+out float height;
+
+/*
+2 (-, +)    3(+, +)
+
+0 (-, -)    1(+, -)
+*/
+
+void EmitSquare(vec3 pos, float size, float h0, float h1, float h2, float h3)
 {
-    gl_Position = Projection * View * vec4(pos + offset, 1.0);
-    EmitVertex();
-}
+    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h0, -size), 1.0);
+    height = h0; EmitVertex();
 
+    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    height = h1; EmitVertex();
+
+    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    height = h2; EmitVertex();
+    EndPrimitive();
+
+    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    height = h2; EmitVertex();
+
+    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    height = h1; EmitVertex();
+
+    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h3, size), 1.0);
+    height = h3; EmitVertex();
+    EndPrimitive();
+}
 
 void main()
 {
-    vec3 p1 = gl_in[0].gl_Position.xyz;
-    vec3 p2 = gl_in[1].gl_Position.xyz;
-    vec3 p3 = gl_in[2].gl_Position.xyz;
+    int rez = 4;
+    float myStep = 1.0 / rez;
+    float myStepText = textSize / rez;
 
-    const vec3 INSTANCE_OFFSET = vec3(1.25, 0, 1.25);
-    const int NR_COLS = 6;
+    int diffHeight = maxHeight - minHeight;
 
-    for (int i = 0; i <= 1; i++)
+    for (float x = -0.5, tx = textPos.x; x <= 0.5; x += myStep, tx += myStepText)
     {
-        vec3 offset = vec3(0, 0, 0);
+        for (float y = -0.5, ty = textPos.y; y <= 0.5; y += myStep, ty += myStepText)
+        {
+            float h0 = diffHeight * texture(texture_1, vec2(tx - myStepText / 2, ty - myStepText / 2)).x + minHeight;
+            float h1 = diffHeight * texture(texture_1, vec2(tx + myStepText / 2, ty - myStepText / 2)).x + minHeight;
+            float h2 = diffHeight * texture(texture_1, vec2(tx - myStepText / 2, ty + myStepText / 2)).x + minHeight;
+            float h3 = diffHeight * texture(texture_1, vec2(tx + myStepText / 2, ty + myStepText / 2)).x + minHeight;
 
-        texture_coord = v_texture_coord[0];
-        EmitPoint(p1, offset);
-
-        texture_coord = v_texture_coord[1];
-        EmitPoint(p2, offset);
-
-        texture_coord = v_texture_coord[2];
-        EmitPoint(p3, offset);
-
-        EndPrimitive();
+            EmitSquare(vec3(x, 0, y), myStep / 2, h0, h1, h2, h3);
+        }
     }
 }

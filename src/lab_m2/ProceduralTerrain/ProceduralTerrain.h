@@ -1,9 +1,9 @@
 #pragma once
 
 #include "components/simple_scene.h"
+#include "PerlinNoise.h"
 
-
-namespace m2
+namespace ptg
 {
     class ProceduralTerrain : public gfxc::SimpleScene
     {
@@ -27,7 +27,22 @@ namespace m2
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
 
-     private:
+        void GenText();
+        void UpdateTexture2D();
+        void RenderText();
+        void RenderTerrain();
 
+     private:
+         std::unique_ptr<PerlinNoise> myPerlinNoise;
+
+         int textureWidth, textureHeight, mapWidth, mapHeight;
+         int minHeight, maxHeight;
+
+         double *heightmap;
+         Texture2D *myTexture{nullptr};
+
+         glm::ivec2 textOnScreenSize {glm::ivec2(300, 300)};
+
+         float myZ{ 0.8 };
     };
 }   // namespace m2

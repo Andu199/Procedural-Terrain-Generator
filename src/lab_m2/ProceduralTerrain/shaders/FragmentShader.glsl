@@ -1,16 +1,14 @@
 #version 430
 
 // Input
-layout(location = 0) in vec2 texture_coord;
-
-// Uniform properties
-uniform sampler2D texture_1;
+//layout(location = 0) in vec2 texture_coord;
 
 // Output
 layout(location = 0) out vec4 out_color;
 
+in float height;
 
 void main()
 {
-    out_color = vec4(1, 1, 1, 0);
+    out_color = vec4(height / 10, height / 10, height / 10, 1);
 }
