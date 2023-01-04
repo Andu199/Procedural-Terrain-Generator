@@ -19,6 +19,7 @@ uniform int minHeight;
 uniform int maxHeight;
 
 out float height;
+out vec2 textCoord;
 
 /*
 2 (-, +)    3(+, +)
@@ -29,29 +30,29 @@ out float height;
 void EmitSquare(vec3 pos, float size, float h0, float h1, float h2, float h3)
 {
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h0, -size), 1.0);
-    height = h0; EmitVertex();
+    height = h0; textCoord = vec2(0, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
-    height = h1; EmitVertex();
+    height = h1; textCoord = vec2(1, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
-    height = h2; EmitVertex();
+    height = h2; textCoord = vec2(0, 1); EmitVertex();
     EndPrimitive();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
-    height = h2; EmitVertex();
+    height = h2; textCoord = vec2(0, 1); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
-    height = h1; EmitVertex();
+    height = h1; textCoord = vec2(1, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h3, size), 1.0);
-    height = h3; EmitVertex();
+    height = h3; textCoord = vec2(1, 1); EmitVertex();
     EndPrimitive();
 }
 
 void main()
 {
-    int rez = 4;
+    int rez = 3;
     float myStep = 1.0 / rez;
     float myStepText = textSize / rez;
 

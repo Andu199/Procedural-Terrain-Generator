@@ -37,8 +37,8 @@ Texture2D::Texture2D()
     cacheInMemory = false;
     targetType = GL_TEXTURE_2D;
     wrappingMode = GL_REPEAT;
-    textureMinFilter = GL_LINEAR;
-    textureMagFilter = GL_LINEAR;
+    textureMinFilter = GL_NEAREST;
+    textureMagFilter = GL_NEAREST;
 }
 
 

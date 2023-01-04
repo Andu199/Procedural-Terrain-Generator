@@ -29,6 +29,9 @@ void ProceduralTerrain::Init()
     camera->SetPositionAndRotation(glm::vec3(0, 5, 4), glm::quat(glm::vec3(-30 * TO_RADIANS, 0, 0)));
     camera->Update();
 
+    grassText = TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "grassM.jpg");
+    cobbleText = TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "cobble.png");
+
     // Load a mesh from file into GPU memory
     {
         Mesh* mesh = new Mesh("bamboo");
@@ -71,6 +74,14 @@ void ProceduralTerrain::Init()
         Shader* shader = new Shader("UI");
         shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "ProceduralTerrain", "shaders", "UIVertexShader.glsl"), GL_VERTEX_SHADER);
         shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "ProceduralTerrain", "shaders", "UIFragmentShader.glsl"), GL_FRAGMENT_SHADER);
+        shader->CreateAndLink();
+        shaders[shader->GetName()] = shader;
+    }
+
+    {
+        Shader* shader = new Shader("Water");
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "ProceduralTerrain", "shaders", "WaterVertexShader.glsl"), GL_VERTEX_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "ProceduralTerrain", "shaders", "WaterFragmentShader.glsl"), GL_FRAGMENT_SHADER);
         shader->CreateAndLink();
         shaders[shader->GetName()] = shader;
     }
@@ -149,9 +160,20 @@ void ProceduralTerrain::FrameStart()
 void ProceduralTerrain::Update(float deltaTimeSeconds)
 {
     ClearScreen(glm::vec3(0.1, 0.2, 0.3));
-    
+
+    /*
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+    */
+
+    glDisable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
     RenderText();
     RenderTerrain();
+    RenderWater(-2, glm::vec4(0.37, 0.81, 0.97, 0.4));
 }
 
 
@@ -161,6 +183,25 @@ void ProceduralTerrain::FrameEnd()
 
     glViewport(0, 0, res.x, res.y);
     //DrawCoordinateSystem();
+}
+
+void ProceduralTerrain::RenderWater(float height, glm::vec4 color)
+{
+    glm::ivec2 res = window->GetResolution();
+    glViewport(0, 0, res.x, res.y);
+
+    auto shader = shaders["Water"];
+    shader->Use();
+
+    glUniform4fv(shader->GetUniformLocation("color"), 1, glm::value_ptr(color));
+
+    glm::mat4 model(1);
+
+    model = glm::translate(model, glm::vec3(0, height, 0));
+    model = glm::rotate(model, RADIANS(90), glm::vec3(1, 0, 0));
+    model = glm::scale(model, glm::vec3(20));
+
+    RenderMesh(meshes["quad"], shader, model);
 }
 
 void ProceduralTerrain::RenderText()
@@ -187,11 +228,17 @@ void ProceduralTerrain::RenderTerrain()
     float textSize = 1.0f / mapWidth;
     glUniform1f(shader->GetUniformLocation("textSize"), textSize);
 
-    myTexture->BindToTextureUnit(GL_TEXTURE2);
-    glUniform1i(shader->GetUniformLocation("texture_1"), 2);
+    myTexture->BindToTextureUnit(GL_TEXTURE1);
+    glUniform1i(shader->GetUniformLocation("texture_1"), 1);
 
     glUniform1i(shader->GetUniformLocation("minHeight"), minHeight);
     glUniform1i(shader->GetUniformLocation("maxHeight"), maxHeight);
+
+    grassText->BindToTextureUnit(GL_TEXTURE2);
+    glUniform1i(shader->GetUniformLocation("grass"), 2);
+
+    cobbleText->BindToTextureUnit(GL_TEXTURE3);
+    glUniform1i(shader->GetUniformLocation("cobble"), 3);
 
     for (int x = -(mapWidth / 2); x < (mapWidth / 2); x++)
     {

@@ -29,6 +29,7 @@ namespace ptg
 
         void GenText();
         void UpdateTexture2D();
+        void RenderWater(float height, glm::vec4 color);
         void RenderText();
         void RenderTerrain();
 
@@ -40,6 +41,8 @@ namespace ptg
 
          double *heightmap;
          Texture2D *myTexture{nullptr};
+
+         Texture2D* grassText, * cobbleText;
 
          glm::ivec2 textOnScreenSize {glm::ivec2(300, 300)};
 
