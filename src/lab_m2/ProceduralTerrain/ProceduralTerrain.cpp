@@ -31,6 +31,7 @@ void ProceduralTerrain::Init()
 
     grassText = TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "grassM.jpg");
     cobbleText = TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "cobble.png");
+    snowText = TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "snow.png");
 
     // Load a mesh from file into GPU memory
     {
@@ -100,6 +101,8 @@ void ProceduralTerrain::Init()
     heightmap = (double*)calloc(textureWidth * textureHeight, sizeof(double));
 
     GenText();
+
+    sun_position = glm::vec3(0, 10000, 0);
 }
 
 void ProceduralTerrain::GenText()
@@ -234,11 +237,16 @@ void ProceduralTerrain::RenderTerrain()
     glUniform1i(shader->GetUniformLocation("minHeight"), minHeight);
     glUniform1i(shader->GetUniformLocation("maxHeight"), maxHeight);
 
+    glUniform3fv(shader->GetUniformLocation("sun_position"), 1, glm::value_ptr(sun_position));
+
     grassText->BindToTextureUnit(GL_TEXTURE2);
     glUniform1i(shader->GetUniformLocation("grass"), 2);
 
     cobbleText->BindToTextureUnit(GL_TEXTURE3);
     glUniform1i(shader->GetUniformLocation("cobble"), 3);
+
+    snowText->BindToTextureUnit(GL_TEXTURE4);
+    glUniform1i(shader->GetUniformLocation("snow"), 4);
 
     for (int x = -(mapWidth / 2); x < (mapWidth / 2); x++)
     {

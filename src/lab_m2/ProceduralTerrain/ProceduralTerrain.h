@@ -42,10 +42,12 @@ namespace ptg
          double *heightmap;
          Texture2D *myTexture{nullptr};
 
-         Texture2D* grassText, * cobbleText;
+         Texture2D* grassText, * cobbleText, * snowText;
 
          glm::ivec2 textOnScreenSize {glm::ivec2(300, 300)};
 
          float myZ{ 0.8 };
+
+         glm::vec3 sun_position;
     };
 }   // namespace m2
