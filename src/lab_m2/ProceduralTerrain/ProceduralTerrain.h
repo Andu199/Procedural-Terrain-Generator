@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/simple_scene.h"
+#include "components/transform.h"
 #include "PerlinNoise.h"
 
 namespace ptg
@@ -47,5 +48,6 @@ namespace ptg
          glm::ivec2 textOnScreenSize {glm::ivec2(300, 300)};
 
          float myZ{ 0.8 };
+         glm::vec4 CurvatureExp;
     };
 }   // namespace m2

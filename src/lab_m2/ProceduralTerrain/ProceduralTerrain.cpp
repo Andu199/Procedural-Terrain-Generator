@@ -86,6 +86,7 @@ void ProceduralTerrain::Init()
         shader->CreateAndLink();
         shaders[shader->GetName()] = shader;
     }
+    CurvatureExp = glm::vec4(0.f, 0.001f, 0.f, 0.f);
 
     myPerlinNoise = make_unique<PerlinNoise>(112);
 
@@ -195,7 +196,10 @@ void ProceduralTerrain::RenderWater(float height, glm::vec4 color)
     shader->Use();
 
     glUniform4fv(shader->GetUniformLocation("color"), 1, glm::value_ptr(color));
+    glUniform4fv(glGetUniformLocation(shader->GetProgramID(), "CurvatureExp"), 1, value_ptr(CurvatureExp));
+    glUniform3fv(glGetUniformLocation(shader->GetProgramID(), "CameraWorldPos"), 1, value_ptr(GetSceneCamera()->m_transform->GetWorldPosition()));
 
+    /*
     glm::mat4 model(1);
 
     model = glm::translate(model, glm::vec3(0, height, 0));
@@ -203,6 +207,22 @@ void ProceduralTerrain::RenderWater(float height, glm::vec4 color)
     model = glm::scale(model, glm::vec3(100));
 
     RenderMesh(meshes["quad"], shader, model);
+    */
+
+    
+    for (int x = -(mapWidth / 2); x < (mapWidth / 2); x++)
+    {
+        for (int y = -(mapHeight / 2); y < (mapHeight / 2); y++)
+        {
+            glm::mat4 model(1);
+            model = glm::translate(model, glm::vec3(x, 0, y));
+            model = glm::scale(model, glm::vec3(0.5, 1, 0.5));
+            model = glm::rotate(model, RADIANS(90), glm::vec3(1, 0, 0));
+
+            RenderMesh(meshes["quad"], shader, model);
+        }
+    }
+    
 }
 
 void ProceduralTerrain::RenderText()
@@ -246,6 +266,12 @@ void ProceduralTerrain::RenderTerrain()
     snowText->BindToTextureUnit(GL_TEXTURE4);
     glUniform1i(shader->GetUniformLocation("snow"), 4);
 
+    glUniform4fv(glGetUniformLocation(shader->GetProgramID(), "CurvatureExp"), 1, value_ptr(CurvatureExp));
+
+    // Bind camera world pos
+    glUniform3fv(glGetUniformLocation(shader->GetProgramID(), "CameraWorldPos"), 1, value_ptr(GetSceneCamera()->m_transform->GetWorldPosition()));
+
+
     for (int x = -(mapWidth / 2); x < (mapWidth / 2); x++)
     {
         for (int y = -(mapHeight / 2); y < (mapHeight / 2); y++)
@@ -286,6 +312,16 @@ void ProceduralTerrain::OnKeyPress(int key, int mods)
     {
         myZ += 0.1f;
         GenText();
+    }
+
+    if (key == GLFW_KEY_Z)
+    {
+        CurvatureExp.y -=  0.005;
+    }
+
+    if (key == GLFW_KEY_X)
+    {
+        CurvatureExp.y += 0.005;
     }
 
     // Add key press event

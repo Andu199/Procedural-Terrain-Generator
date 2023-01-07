@@ -18,6 +18,9 @@ uniform float textSize;
 uniform int minHeight;
 uniform int maxHeight;
 
+uniform vec4 CurvatureExp;
+uniform vec3 CameraWorldPos;
+
 out float height;
 out vec2 textCoord;
 
@@ -77,34 +80,60 @@ vec4 squareNormal(float h0, float h1, float h2, float h3, float size)
 void EmitSquare(vec3 pos, float size, float h0, float h1, float h2, float h3)
 {
     vec3 norm = squareNormal(h0, h1, h2, h3, size).xyz;
+    float dist = 0;
+    vec4 vpos;
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h0, -size), 1.0);
+    vpos = Model * vec4(pos + vec3(-size, h0, -size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(-size, h0, -size), 1.0));
     world_normal = norm;
     height = h0; textCoord = vec2(0, 0); EmitVertex();
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    vpos = Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(size, h1, -size), 1.0));
     world_normal = norm;
     height = h1; textCoord = vec2(1, 0); EmitVertex();
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    vpos =  Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(-size, h2, size), 1.0));
     world_normal = norm;
     height = h2; textCoord = vec2(0, 1); EmitVertex();
     EndPrimitive();
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    vpos =  Model * vec4(pos + vec3(-size, h2, size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(-size, h2, size), 1.0));
     world_normal = norm;
     height = h2; textCoord = vec2(0, 1); EmitVertex();
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    vpos =  Model * vec4(pos + vec3(size, h1, -size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(size, h1, -size), 1.0));
     world_normal = norm;
     height = h1; textCoord = vec2(1, 0); EmitVertex();
 
-    gl_Position = Projection * View * Model * vec4(pos + vec3(size, h3, size), 1.0);
+    vpos =  Model * vec4(pos + vec3(size, h3, size), 1.0);
+    dist = distance(CameraWorldPos, vpos.xyz);
+    vpos -= (dist * dist) * CurvatureExp;
+
+    gl_Position = Projection * View * vpos;
     world_position = vec3(Model * vec4(pos + vec3(size, h3, size), 1.0));
     world_normal = norm;
     height = h3; textCoord = vec2(1, 1); EmitVertex();
