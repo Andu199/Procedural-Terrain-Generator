@@ -92,17 +92,15 @@ void ProceduralTerrain::Init()
     textureWidth = 500;
     textureHeight = 500;
 
-    mapWidth = 30;
-    mapHeight = 30;
+    mapWidth = 60;
+    mapHeight = 60;
 
     minHeight = -10;
-    maxHeight = 10;
+    maxHeight = 20;
 
     heightmap = (double*)calloc(textureWidth * textureHeight, sizeof(double));
 
     GenText();
-
-    sun_position = glm::vec3(0, 10000, 0);
 }
 
 void ProceduralTerrain::GenText()
@@ -176,7 +174,7 @@ void ProceduralTerrain::Update(float deltaTimeSeconds)
 
     RenderText();
     RenderTerrain();
-    RenderWater(-2, glm::vec4(0.37, 0.81, 0.97, 0.4));
+    RenderWater(0, glm::vec4(0.37, 0.81, 0.97, 0.4));
 }
 
 
@@ -202,7 +200,7 @@ void ProceduralTerrain::RenderWater(float height, glm::vec4 color)
 
     model = glm::translate(model, glm::vec3(0, height, 0));
     model = glm::rotate(model, RADIANS(90), glm::vec3(1, 0, 0));
-    model = glm::scale(model, glm::vec3(20));
+    model = glm::scale(model, glm::vec3(100));
 
     RenderMesh(meshes["quad"], shader, model);
 }
@@ -237,7 +235,7 @@ void ProceduralTerrain::RenderTerrain()
     glUniform1i(shader->GetUniformLocation("minHeight"), minHeight);
     glUniform1i(shader->GetUniformLocation("maxHeight"), maxHeight);
 
-    glUniform3fv(shader->GetUniformLocation("sun_position"), 1, glm::value_ptr(sun_position));
+    glUniform1f(shader->GetUniformLocation("time"), Engine::GetElapsedTime());
 
     grassText->BindToTextureUnit(GL_TEXTURE2);
     glUniform1i(shader->GetUniformLocation("grass"), 2);

@@ -47,7 +47,5 @@ namespace ptg
          glm::ivec2 textOnScreenSize {glm::ivec2(300, 300)};
 
          float myZ{ 0.8 };
-
-         glm::vec3 sun_position;
     };
 }   // namespace m2

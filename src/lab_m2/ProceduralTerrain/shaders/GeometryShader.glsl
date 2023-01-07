@@ -55,37 +55,58 @@ vec4 compute_normal(float h2, float h0, float h3, float size)
     return normalize(normal);
 }
 
+vec4 squareNormal(float h0, float h1, float h2, float h3, float size)
+{
+    vec4 myNormal = vec4(0, 1, 0, 1);
+
+    float h01 = (h0 + h1) / 2;
+    float h23 = (h2 + h3) / 2;
+
+    float h02 = (h0 + h2) / 2;
+    float h13 = (h1 + h3) / 2;
+
+    float angleX = atan((h23 - h01) / (2 * size));
+    float angleZ = atan((h02 - h13) / (2 * size));
+
+    myNormal = rotationMatrix(vec3(1, 0, 0), angleX) * myNormal;
+    myNormal = rotationMatrix(vec3(0, 0, 1), angleZ) * myNormal;
+
+    return myNormal;
+}
+
 void EmitSquare(vec3 pos, float size, float h0, float h1, float h2, float h3)
 {
+    vec3 norm = squareNormal(h0, h1, h2, h3, size).xyz;
+
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h0, -size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(-size, h0, -size), 1.0));
-    world_normal = vec3(Model * compute_normal(h0, h2, h1, size));
+    world_normal = norm;
     height = h0; textCoord = vec2(0, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(size, h1, -size), 1.0));
-    world_normal = vec3(Model * compute_normal(h1, h3, h0, size));
+    world_normal = norm;
     height = h1; textCoord = vec2(1, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(-size, h2, size), 1.0));
-    world_normal = vec3(Model * compute_normal(h2, h0, h3, size));
+    world_normal = norm;
     height = h2; textCoord = vec2(0, 1); EmitVertex();
     EndPrimitive();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(-size, h2, size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(-size, h2, size), 1.0));
-    world_normal = vec3(Model * compute_normal(h2, h0, h3, size));
+    world_normal = norm;
     height = h2; textCoord = vec2(0, 1); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h1, -size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(size, h1, -size), 1.0));
-    world_normal = vec3(Model * compute_normal(h1, h3, h0, size));
+    world_normal = norm;
     height = h1; textCoord = vec2(1, 0); EmitVertex();
 
     gl_Position = Projection * View * Model * vec4(pos + vec3(size, h3, size), 1.0);
     world_position = vec3(Model * vec4(pos + vec3(size, h3, size), 1.0));
-    world_normal = vec3(Model * compute_normal(h3, h1, h2, size));
+    world_normal = norm;
     height = h3; textCoord = vec2(1, 1); EmitVertex();
     EndPrimitive();
 }
