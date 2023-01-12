@@ -49,10 +49,24 @@ void main()
 {
     float color_intensity = get_light();
 
-    if (height < 0)
+
+
+    if (height < 0) {
         out_color = vec4(texture(cobble, textCoord).xyz * color_intensity, 1);
-    else if (height < 7)
+
+    } else if (height < 4) {
+        vec4 c1 = vec4(texture(cobble, textCoord).xyz * color_intensity, 1);
+        vec4 c2 = vec4(texture(grass, textCoord).xyz * color_intensity, 1);
+
+        out_color = mix(c1, c2, (height) / 4);
+    } else if (height < 6)
         out_color = vec4(texture(grass, textCoord).xyz * color_intensity, 1);
-    else
+    else if (height < 8) {
+        vec4 c1 = vec4(texture(grass, textCoord).xyz * color_intensity, 1);
+        vec4 c2 = vec4(texture(snow, textCoord).xyz * color_intensity, 1);
+
+        out_color = mix(c1, c2, (height - 6) / 2);
+
+    } else
         out_color = vec4(texture(snow, textCoord).xyz * color_intensity, 1);
 }
